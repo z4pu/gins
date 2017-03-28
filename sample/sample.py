@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python3
 
-from . import helpers
+import helpers
 
 def get_hmm():
     """Get a thought."""
