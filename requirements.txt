@@ -1,2 +1,5 @@
 nose
 sphinx
+beautifulsoup4
+lxml
+requests

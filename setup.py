@@ -10,14 +10,13 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='sample',
+    name='gins',
     version='0.1.0',
-    description='Sample package for Python-Guide.org',
+    description='Goethe Institut Singapore scraper',
     long_description=readme,
-    author='Kenneth Reitz',
-    author_email='me@kennethreitz.com',
-    url='https://github.com/kennethreitz/samplemod',
+    author='szp',
+    author_email='luminasce@gmail.com',
+    url='https://github.com/z4pu/gins',
     license=license,
     packages=find_packages(exclude=('tests', 'docs'))
 )
-

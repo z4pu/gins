@@ -1,6 +1,4 @@
 Sample Module Repository
 ========================
 
-This simple project is an example repo for Python projects.
-
-`Learn more <http://www.kennethreitz.org/essays/repository-structure-and-python>`_.
+Sample.py is a webscraper for various pages from www.goethe.de/ins/sg/.
