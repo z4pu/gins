@@ -4,7 +4,7 @@
 import helpers
 import requests
 from lxml import html
-from beautifulsoup4 import BeautifulSoup
+from bs4 import BeautifulSoup
 
 # URLS for Goethe Institut pages
 sites = {'exam': 'https://www.goethe.de/ins/sg/en/spr/prf/anm.html' ,
@@ -16,7 +16,7 @@ def get_info(address):
     page = requests.get(address)
     if page.status_code == 200:
         tree = html.fromstring(page.content)
-        print("Tree success!")
+        print(address+" "+"Tree success!")
         return tree
     elif 100 <= page.status_code <200:
         print(page.status_code)
