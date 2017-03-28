@@ -26,17 +26,9 @@ def get_info(address):
         page.raise_for_status()
 
 
-def get_course():
-    page = requests.get('https://www.goethe.de/ins/sg/en/spr/kur/gia/tup.cfm')
-    return
+#def parse_examInfo():
 
-def get_testDaF():
-    page = requests.get('http://www.testdaf.de/fuer-teilnehmende/die-pruefung/pruefungstermine/')
-    return
 
-def get_registrationInfo():
-    page = requests.get('https://www.goethe.de/ins/sg/en/spr/kur/gia/kue.html')
-    return
 
 def main():
     for k, v in sites.items():
