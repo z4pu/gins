@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python3
+#
+# source v_env/bin/activate
+# cd sample
+# python3 sample.py
 
 import helpers
 import requests
@@ -44,6 +48,14 @@ def parse_courseInfo(soup):
     print("==========")
     print("  COURSES ")
     print("==========")
+    courseDetails = soup.find_all("table", class_="kursfinder")
+    for item in courseDetails:
+        stack = []
+        for td in item.find_all("td"):
+            #stack.append(td.text.replace('\n', '').replace('\t', '').strip())
+            stack.append(td.text.replace('Registration, ', '\n').replace('\n', '').replace('\t', '').strip())
+        print(", ".join(stack) + '\n')
+        #print(re.sub(r'\n\s*', r'\n', item.get_text().strip(), flags=re.M))
     print('\n')
     return 0
 
@@ -61,13 +73,13 @@ def parse_testDaFInfo(soup):
     return 0
 
 def parse_registrationInfo(soup):
-    courseStart = soup.find_all("div", class_="accordion_content", limit = 1)
+    courseStart = soup.find_all("div", class_="accordion_content", limit = 2)
     print("==============")
     print(" Registration ")
     print("==============")
     for item in courseStart:
         print(re.sub(r'\n\s*', r'\n', item.get_text().strip(), flags=re.M))
-    print('\n')
+        print('\n')
     return 0
 
 def main():
