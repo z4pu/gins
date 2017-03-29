@@ -36,14 +36,15 @@ def parse_examInfo(soup):
     examDetails = soup.find_all("table", class_= "standardTabelle gruen")
     for item in examDetails:
         #re.sub(r'\n\s*\n', r'\n\n', item.get_text().strip(), flags=re.M)
-        print(re.sub(r'\n\s*\n', r'\n\n', item.get_text().strip(), flags=re.M))
+        print(re.sub(r'\n\s*', r'\n', item.get_text().strip(), flags=re.M))
+    print('\n')
     return 0
 
 def parse_courseInfo(soup):
     print("==========")
     print("  COURSES ")
     print("==========")
-
+    print('\n')
     return 0
 
 def parse_testDaFInfo(soup):
@@ -53,10 +54,10 @@ def parse_testDaFInfo(soup):
     print(" TestDAF INFO")
     print("=============")
     for item in table1:
-        print(re.sub(r'\n\s*\n', r'\n\n', item.get_text().strip(), flags=re.M))
+        print(re.sub(r'\n\s*', r'\n', item.get_text().strip(), flags=re.M))
     for i in table2:
-        print(re.sub(r'\n\s*\n', r'\n\n', i.get_text().strip(), flags=re.M))
-    #print(table2)
+        print(re.sub(r'\n\s*', r'\n', i.get_text().strip(), flags=re.M))
+    print('\n')
     return 0
 
 def parse_registrationInfo(soup):
@@ -65,7 +66,8 @@ def parse_registrationInfo(soup):
     print(" Registration ")
     print("==============")
     for item in courseStart:
-        print(re.sub(r'\n\s*\n', r'\n\n', item.get_text().strip(), flags=re.M))
+        print(re.sub(r'\n\s*', r'\n', item.get_text().strip(), flags=re.M))
+    print('\n')
     return 0
 
 def main():
