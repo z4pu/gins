@@ -55,25 +55,12 @@ def parse_examInfo(soup):
     print('\n')
     return 0
 
-def parse_courseInfo(soup):
+def parse_courseInfoOld(soup):
     print("==========")
     print("  COURSES ")
     print("==========")
 
-    # Page is not possible to scrape without Selenium. Because Javascript.
-    #browser = webdriver.Firefox() # Instantiate a webdriver object
-    #browser.get(sites['course']) # Go to page
-
-    # Makes list of links to get full image
-    #linksList = []
-    # This is the container of images on the main page
-    #cards = browser.find_elements_by_class_name('image-list-link')
-    #for img_src in cards:
-    # Now assemble list to pass to requests and beautifulsoup
-    #    linksList.append(img_src.get_attribute('href'))
-
-
-    # <div class="paginierung">
+        # <div class="paginierung">
 	#<a href="javascript:$('#start').val('0'); $('#kursfinderForm').submit()" class="icon-double-arrow-left"></a>
 	#		<span class="aktuelleSeite">1</span>
 	#<a href="javascript:$('#start').val('20'); $('#kursfinderForm').submit()">2</a>
@@ -105,28 +92,61 @@ def parse_courseInfo(soup):
     print('\n')
     return 0
 
+def parse_courseInfo(soup):
+    print("==========")
+    print("  COURSES ")
+    print("==========")
+    # Page is not possible to scrape without Selenium. Because Javascript.
+    browser = webdriver.Firefox(executable_path='/usr/local/src/geckodriver') # Instantiate a webdriver object
+    browser.get(sites['course']) # Go to page
+
+    # Makes list of links to get full image
+    linksList = []
+    # This is the container of pagelinks on the main page
+    linksContainer = browser.find_elements_by_class_name("paginierung")
+    page_count_links = linksContainer.find_elements_by_tag_name("a")
+    unique_links = set(page_count_links)
+    for link in unique_links:
+    # Now assemble list to pass to requests and beautifulsoup
+        linksList.append(link.get_attribute('href'))
+
+
+
+        # <div class="paginierung">
+	#<a href="javascript:$('#start').val('0'); $('#kursfinderForm').submit()" class="icon-double-arrow-left"></a>
+	#		<span class="aktuelleSeite">1</span>
+	#<a href="javascript:$('#start').val('20'); $('#kursfinderForm').submit()">2</a>
+	#<a href="javascript:$('#start').val('20'); $('#kursfinderForm').submit()" class="icon-double-arrow-right"></a>
+    #</div>
+
+    # https://www.goethe.de/ins/sg/en/spr/kur/gia/tup.cfm?sortorder=course_startdate+ASC&start=20&limit=20&location=&coursetype=&pace=&coursestart=&format=&level=
+    # <a href="javascript:$('#start').val('20'); $('#kursfinderForm').submit()">2</a>
+    # http://stackoverflow.com/questions/26497722/scrape-multiple-pages-with-beautifulsoup-and-python
+    # Use regex to isolate only the links of the page numbers, the one you click on.
+
+    # FIND COURSE DATA IN TABLE
+    for url_ in linksList:
+        page = requests.get(url_)
+        newSoup = BeautifulSoup(page.text, "lxml")
+        table_new = newSoup.find("table", class_="kursfinder")
+        for row in table_new.find_all('tr'):
+            for cell in row.find_all('td'):
+                print(re.sub(r'\n\s*', r'\n', cell.get_text().strip(), flags=re.M))
+    print('\n')
+    return 0
+
 def js_courseInfo():
-    search_term = 'dryscrape'
+    # Page is not possible to scrape without Selenium. Because Javascript.
+    #browser = webdriver.Firefox() # Instantiate a webdriver object
+    #browser.get(sites['course']) # Go to page
 
-    # set up a web scraping session
-    sess = dryscrape.Session(base_url = sites['course'])
-
-    # we don't need images
-    sess.set_attribute('auto_load_images', False)
-
-    # visit homepage and search for a term
-    sess.visit('/')
-    q = sess.at_xpath('//*[@name="q"]')
-    q.set(search_term)
-    q.form().submit()
-
-    # extract all links
-    for link in sess.xpath('//a[@href]'):
-        print(link['href'])
-
-    # save a screenshot of the web page
-    sess.render('google.png')
-    print("Screenshot written to 'google.png'")
+    # Makes list of links to get full image
+    #linksList = []
+    # This is the container of images on the main page
+    #cards = browser.find_elements_by_class_name('image-list-link')
+    #for img_src in cards:
+    # Now assemble list to pass to requests and beautifulsoup
+    #    linksList.append(img_src.get_attribute('href'))
     return 0
 
 def parse_testDaFInfo(soup):
