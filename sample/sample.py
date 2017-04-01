@@ -24,7 +24,7 @@ if 'linux' in sys.platform:
 
 # URLS for Goethe Institut pages
 sites = {'exam': 'https://www.goethe.de/ins/sg/en/spr/prf/anm.html' ,
-        'course': 'https://www.goethe.de/ins/sg/en/spr/kur/gia/tup.cfm?sortorder=course_startdate+ASC',
+        'course': 'https://www.goethe.de/ins/sg/en/spr/kur/gia/tup.cfm',
         'testDaF': 'http://www.testdaf.de/fuer-teilnehmende/die-pruefung/pruefungstermine/',
         'registration' : 'https://www.goethe.de/ins/sg/en/spr/kur/gia/kue.html'}
 
@@ -100,15 +100,19 @@ def parse_courseInfo(soup):
     browser = webdriver.Firefox(executable_path='/usr/local/src/geckodriver') # Instantiate a webdriver object
     browser.get(sites['course']) # Go to page
 
-    # Makes list of links to get full image
+    # Makes list of links
     linksList = []
     # This is the container of pagelinks on the main page
-    linksContainer = browser.find_elements_by_class_name("paginierung")
-    page_count_links = linksContainer.find_elements_by_tag_name("a")
-    unique_links = set(page_count_links)
-    for link in unique_links:
+    linksContainer = browser.find_elements_by_xpath("/html/body/div/div/div/div/article/div/div/div/a")
+
+    for link in linksContainer:
     # Now assemble list to pass to requests and beautifulsoup
-        linksList.append(link.get_attribute('href'))
+        click()
+        table_new = soup.find("table", class_="kursfinder")
+        for row in table_new.find_all('tr'):
+            for cell in row.find_all('td'):
+                print(re.sub(r'\n\s*', r'\n', cell.get_text().strip(), flags=re.M))
+    print('\n')
 
 
 
@@ -125,14 +129,15 @@ def parse_courseInfo(soup):
     # Use regex to isolate only the links of the page numbers, the one you click on.
 
     # FIND COURSE DATA IN TABLE
-    for url_ in linksList:
-        page = requests.get(url_)
-        newSoup = BeautifulSoup(page.text, "lxml")
-        table_new = newSoup.find("table", class_="kursfinder")
-        for row in table_new.find_all('tr'):
-            for cell in row.find_all('td'):
-                print(re.sub(r'\n\s*', r'\n', cell.get_text().strip(), flags=re.M))
-    print('\n')
+    #for url_ in linksList:
+    #    browser.get("{}?{}".format(sites['course'], url_) # Go to page
+    #    newSoup = BeautifulSoup(browser.page_source)
+    #    table_new = newSoup.find("table", class_="kursfinder")
+    #    for row in table_new.find_all('tr'):
+    #        for cell in row.find_all('td'):
+    #            print(re.sub(r'\n\s*', r'\n', cell.get_text().strip(), flags=re.M))
+    #print('\n')
+    browser.close()
     return 0
 
 def js_courseInfo():
