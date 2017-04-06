@@ -8,12 +8,18 @@
 import helpers
 import requests
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common import exceptions
+
 from lxml import html
 from bs4 import BeautifulSoup
 import dryscrape
 import sys
 import re
 import pdb
+import time
 
 # http://dryscrape.readthedocs.io/en/latest/usage.html#first-demonstration
 if 'linux' in sys.platform:
@@ -27,6 +33,7 @@ sites = {'exam': 'https://www.goethe.de/ins/sg/en/spr/prf/anm.html' ,
         'course': 'https://www.goethe.de/ins/sg/en/spr/kur/gia/tup.cfm',
         'testDaF': 'http://www.testdaf.de/fuer-teilnehmende/die-pruefung/pruefungstermine/',
         'registration' : 'https://www.goethe.de/ins/sg/en/spr/kur/gia/kue.html'}
+
 
 def get_info(address):
     page = requests.get(address)
@@ -92,52 +99,44 @@ def parse_courseInfoOld(soup):
     print('\n')
     return 0
 
+def get_table_results(driver):
+    table = driver.find_element_by_tag_name("tbody")
+    for row in table.find_elements_by_tag_name('tr'):
+        for cell in row.find_elements_by_tag_name('td'):
+            print(re.sub(r'\n\s*', r'\n', cell.text, flags=re.M))
+
+
 def parse_courseInfo(soup):
-    print("==========")
+    print("===========")
     print("  COURSES ")
-    print("==========")
+    print("===========")
     # Page is not possible to scrape without Selenium. Because Javascript.
-    browser = webdriver.Firefox(executable_path='/usr/local/src/geckodriver') # Instantiate a webdriver object
-    browser.get(sites['course']) # Go to page
+    driver = webdriver.Firefox(executable_path='/usr/local/src/geckodriver') # Instantiate a webdriver object
+    driver.get(sites['course']) # Go to page
 
-    # Makes list of links
-    linksList = []
-    # This is the container of pagelinks on the main page
-    linksContainer = browser.find_elements_by_xpath("/html/body/div/div/div/div/article/div/div/div/a")
+    # initial wait for results
+    WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element((By.CLASS_NAME, "aktuelleSeite"), "1"))
 
-    for link in linksContainer:
-    # Now assemble list to pass to requests and beautifulsoup
-        click()
-        table_new = soup.find("table", class_="kursfinder")
-        for row in table_new.find_all('tr'):
-            for cell in row.find_all('td'):
-                print(re.sub(r'\n\s*', r'\n', cell.get_text().strip(), flags=re.M))
-    print('\n')
+    while True:
+    # print current page number
+        page_number = int(driver.find_element_by_class_name("aktuelleSeite").text)
+        print ("----------")
+        print("  Page #" + str(page_number))
+        print ("---------")
 
+        get_table_results(driver)
 
-
-        # <div class="paginierung">
-	#<a href="javascript:$('#start').val('0'); $('#kursfinderForm').submit()" class="icon-double-arrow-left"></a>
-	#		<span class="aktuelleSeite">1</span>
-	#<a href="javascript:$('#start').val('20'); $('#kursfinderForm').submit()">2</a>
-	#<a href="javascript:$('#start').val('20'); $('#kursfinderForm').submit()" class="icon-double-arrow-right"></a>
-    #</div>
-
-    # https://www.goethe.de/ins/sg/en/spr/kur/gia/tup.cfm?sortorder=course_startdate+ASC&start=20&limit=20&location=&coursetype=&pace=&coursestart=&format=&level=
-    # <a href="javascript:$('#start').val('20'); $('#kursfinderForm').submit()">2</a>
-    # http://stackoverflow.com/questions/26497722/scrape-multiple-pages-with-beautifulsoup-and-python
-    # Use regex to isolate only the links of the page numbers, the one you click on.
-
-    # FIND COURSE DATA IN TABLE
-    #for url_ in linksList:
-    #    browser.get("{}?{}".format(sites['course'], url_) # Go to page
-    #    newSoup = BeautifulSoup(browser.page_source)
-    #    table_new = newSoup.find("table", class_="kursfinder")
-    #    for row in table_new.find_all('tr'):
-    #        for cell in row.find_all('td'):
-    #            print(re.sub(r'\n\s*', r'\n', cell.get_text().strip(), flags=re.M))
-    #print('\n')
-    browser.close()
+        try:
+            next_link = driver.find_element_by_link_text(str(page_number+1))
+            next_link.click()
+            time.sleep(2)  # TODO: fix?
+            # wait for results to load
+            WebDriverWait(driver, 10).until(EC.staleness_of(next_link))
+        except:
+            print("---------------")
+            print("End of results")
+            break
+    driver.close()
     return 0
 
 def js_courseInfo():
