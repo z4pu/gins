@@ -62,42 +62,7 @@ def parse_examInfo(soup):
     print('\n')
     return 0
 
-def parse_courseInfoOld(soup):
-    print("==========")
-    print("  COURSES ")
-    print("==========")
 
-        # <div class="paginierung">
-	#<a href="javascript:$('#start').val('0'); $('#kursfinderForm').submit()" class="icon-double-arrow-left"></a>
-	#		<span class="aktuelleSeite">1</span>
-	#<a href="javascript:$('#start').val('20'); $('#kursfinderForm').submit()">2</a>
-	#<a href="javascript:$('#start').val('20'); $('#kursfinderForm').submit()" class="icon-double-arrow-right"></a>
-    #</div>
-
-    # https://www.goethe.de/ins/sg/en/spr/kur/gia/tup.cfm?sortorder=course_startdate+ASC&start=20&limit=20&location=&coursetype=&pace=&coursestart=&format=&level=
-    # <a href="javascript:$('#start').val('20'); $('#kursfinderForm').submit()">2</a>
-    # http://stackoverflow.com/questions/26497722/scrape-multiple-pages-with-beautifulsoup-and-python
-    # Use regex to isolate only the links of the page numbers, the one you click on.
-    links = soup.find("div", class_="paginierung")
-    page_count_links = links.find_all("a",href=re.compile(r".*javascript.*"))
-
-    try: # Make sure there are more than one page, otherwise, set to 1.
-        num_pages = len(page_count_links)-1
-    except IndexError:
-        num_pages = 1
-
-    # Add 1 because Python range.
-    url_list = ["{}&start={}{}".format(sites['course'], str(20*page-20),
-        '&limit=20&location=&coursetype=&pace=&coursestart=&format=&level=') for page in range(1, num_pages + 1)]
-
-    # FIND COURSE DATA IN TABLE
-    for url_ in url_list:
-        table_new = soup.find("table", class_="kursfinder")
-        for row in table_new.find_all('tr'):
-            for cell in row.find_all('td'):
-                print(re.sub(r'\n\s*', r'\n', cell.get_text().strip(), flags=re.M))
-    print('\n')
-    return 0
 
 def get_table_results(driver):
     table = driver.find_element_by_tag_name("tbody")
@@ -139,19 +104,7 @@ def parse_courseInfo(soup):
     driver.close()
     return 0
 
-def js_courseInfo():
-    # Page is not possible to scrape without Selenium. Because Javascript.
-    #browser = webdriver.Firefox() # Instantiate a webdriver object
-    #browser.get(sites['course']) # Go to page
 
-    # Makes list of links to get full image
-    #linksList = []
-    # This is the container of images on the main page
-    #cards = browser.find_elements_by_class_name('image-list-link')
-    #for img_src in cards:
-    # Now assemble list to pass to requests and beautifulsoup
-    #    linksList.append(img_src.get_attribute('href'))
-    return 0
 
 def parse_testDaFInfo(soup):
     table1 = soup.find("div", id = "c3430", class_="csc-default")
